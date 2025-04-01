@@ -1,0 +1,253 @@
+openapi: 3.0.3
+info:
+  title: Car Rental API
+  description: API for managing cars and reservations in a car rental system.
+  version: 1.0.0
+servers:
+  - url: https://api.carrental.com/v1
+
+paths:
+  /cars:
+    get:
+      summary: Retrieve a list of all cars
+      operationId: getCars
+      parameters:
+        - name: status
+          in: query
+          description: Filter cars by status (available, rented, maintenance)
+          required: false
+          schema:
+            type: string
+            enum: [available, rented, maintenance]
+      responses:
+        '200':
+          description: List of cars
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Car'
+    post:
+      summary: Add a new car
+      operationId: createCar
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Car'
+      responses:
+        '201':
+          description: Car successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Car'
+        '400':
+          description: Invalid request data
+
+  /cars/{carId}:
+    get:
+      summary: Retrieve car details by ID
+      operationId: getCarById
+      parameters:
+        - name: carId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: "^car_\\d+$"
+      responses:
+        '200':
+          description: Car details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Car'
+        '404':
+          description: Car not found
+    put:
+      summary: Update a car by ID
+      operationId: updateCar
+      parameters:
+        - name: carId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: "^car_\\d+$"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Car'
+      responses:
+        '200':
+          description: Car successfully updated
+        '400':
+          description: Invalid request data
+        '404':
+          description: Car not found
+    delete:
+      summary: Delete a car by ID
+      operationId: deleteCar
+      parameters:
+        - name: carId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: "^car_\\d+$"
+      responses:
+        '204':
+          description: Car successfully deleted
+        '404':
+          description: Car not found
+
+  /reservations:
+    get:
+      summary: Retrieve a list of all reservations
+      operationId: getReservations
+      parameters:
+        - name: status
+          in: query
+          description: Filter reservations by status (pending, confirmed, canceled)
+          required: false
+          schema:
+            type: string
+            enum: [pending, confirmed, canceled]
+      responses:
+        '200':
+          description: List of reservations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Reservation'
+    post:
+      summary: Create a new reservation
+      operationId: createReservation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Reservation'
+      responses:
+        '201':
+          description: Reservation successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+        '400':
+          description: Invalid request data
+
+  /reservations/{reservationId}:
+    get:
+      summary: Retrieve reservation details by ID
+      operationId: getReservationById
+      parameters:
+        - name: reservationId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: "^res_\\d+$"
+      responses:
+        '200':
+          description: Reservation details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+        '404':
+          description: Reservation not found
+    put:
+      summary: Update a reservation by ID
+      operationId: updateReservation
+      parameters:
+        - name: reservationId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: "^res_\\d+$"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Reservation'
+      responses:
+        '200':
+          description: Reservation successfully updated
+        '400':
+          description: Invalid request data
+        '404':
+          description: Reservation not found
+    delete:
+      summary: Delete a reservation by ID
+      operationId: deleteReservation
+      parameters:
+        - name: reservationId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: "^res_\\d+$"
+      responses:
+        '204':
+          description: Reservation successfully deleted
+        '404':
+          description: Reservation not found
+
+components:
+  schemas:
+    Car:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "car_123"
+        make:
+          type: string
+          example: "Toyota"
+        model:
+          type: string
+          example: "Corolla"
+        year:
+          type: integer
+          example: 2022
+        status:
+          type: string
+          enum: [available, rented, maintenance]
+          example: "available"
+
+    Reservation:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "res_456"
+        carId:
+          type: string
+          example: "car_123"
+        customerName:
+          type: string
+          example: "John Doe"
+        startDate:
+          type: string
+          format: date
+          example: "2025-04-01"
+        endDate:
+          type: string
+          format: date
+          example: "2025-04-10"
+        status:
+          type: string
+          enum: [pending, confirmed, canceled]
+          example: "confirmed"
